@@ -25,6 +25,20 @@ Academic Live Translator 是一个本地优先的实时语音转录、翻译与�
 - TXT、Markdown、SRT、JSON 导出
 - Portable-by-default：`.venv/`、`data/`、`models/`、`runtime/`、`cache/`、`logs/` 均保存在项目目录内
 
+### Whisper 模型选择建议
+
+项目默认使用 `base`。如果不确定应该选择哪个模型，建议保持默认设置。对于实时字幕，模型越大并不一定越适合；硬件性能不足时，大模型可能无法跟上讲话速度，并进一步拖慢后续翻译。
+
+| 模型 | 参数量 | 官方参考显存 | 建议配置 | 适合场景 |
+| --- | ---: | ---: | --- | --- |
+| `tiny` | 39M | ~1 GB | 4 核 CPU、8 GB 内存即可；无需独立显卡 | 低配置电脑，优先保证实时速度，准确率要求较低 |
+| `base` | 74M | ~1 GB | 4 核以上现代 CPU、8 GB 内存；有 GPU 会更快 | **默认推荐**，速度、准确率和资源占用最均衡 |
+| `small` | 244M | ~2 GB | 建议 6 核 CPU、16 GB 内存，或 4 GB 以上显存的 NVIDIA GPU | 中等配置电脑，希望提高识别准确率 |
+| `medium` | 769M | ~5 GB | 建议 NVIDIA GPU 6 GB 以上显存，或 16 GB 以上统一内存的 Apple silicon；不建议仅靠普通 CPU 实时运行 | 较高配置设备，对准确率要求较高 |
+| `large-v3-turbo` | 809M | ~6 GB | 建议 NVIDIA GPU 8 GB 以上显存，或 16 GB 以上统一内存的 Apple silicon；CPU-only 不推荐用于实时字幕 | 高性能设备，在保持较高准确率的同时使用更大的模型 |
+
+> 显存数字来自 OpenAI Whisper 的官方参考值。Academic Live Translator 在 Windows / Linux 上使用 faster-whisper，在 Apple silicon 上可使用 MLX，因此实际内存占用和速度会因设备、计算精度和音频内容而变化。CPU-only 用户优先选择 `tiny`、`base` 或 `small`。
+
 ## 使用方法
 
 ### Windows
