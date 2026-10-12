@@ -25,6 +25,20 @@ Main features:
 - TXT, Markdown, SRT, and JSON export
 - Portable-by-default storage: `.venv/`, `data/`, `models/`, `runtime/`, `cache/`, and `logs/` stay inside the project directory
 
+### Choosing a Whisper model
+
+The default model is `base`. If you are unsure which model to use, keep the default. For live subtitles, a larger model is not always better: on slower hardware it may fall behind the speaker and delay the translation pipeline.
+
+| Model | Parameters | Official reference VRAM | Recommended hardware | Best for |
+| --- | ---: | ---: | --- | --- |
+| `tiny` | 39M | ~1 GB | 4-core CPU and 8 GB system RAM; discrete GPU not required | Low-end systems where latency matters more than accuracy |
+| `base` | 74M | ~1 GB | Modern 4-core+ CPU and 8 GB system RAM; GPU improves speed | **Default recommendation** with the best overall balance |
+| `small` | 244M | ~2 GB | Recommended: 6-core CPU and 16 GB RAM, or NVIDIA GPU with 4 GB+ VRAM | Mid-range systems that need better recognition accuracy |
+| `medium` | 769M | ~5 GB | Recommended: NVIDIA GPU with 6 GB+ VRAM, or Apple silicon with 16 GB+ unified memory; ordinary CPU-only use is not recommended for live transcription | Higher-end systems where accuracy is prioritized |
+| `large-v3-turbo` | 809M | ~6 GB | Recommended: NVIDIA GPU with 8 GB+ VRAM, or Apple silicon with 16 GB+ unified memory; CPU-only is not recommended for live subtitles | High-performance systems using the largest supported model while retaining good speed |
+
+> VRAM figures are approximate values published by OpenAI for Whisper. Academic Live Translator uses faster-whisper on Windows / Linux and can use MLX on Apple silicon, so actual memory usage and speed depend on the device, compute type, and audio. CPU-only users should generally choose `tiny`, `base`, or `small`.
+
 ## Usage
 
 ### Windows
