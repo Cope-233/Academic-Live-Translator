@@ -2,7 +2,7 @@ from __future__ import annotations
 import json, shutil, uuid
 from datetime import datetime, timezone
 from .config import SESSIONS_DIR, session_assets_dir
-from .models import Annotation, ScreenshotAsset, Segment, SessionData
+from .models import Annotation, DefenseQATurn, ScreenshotAsset, Segment, SessionData
 
 def now_iso(): return datetime.now(timezone.utc).isoformat()
 def _path(session_id:str): return SESSIONS_DIR/f"{session_id}.json"
@@ -18,7 +18,8 @@ def list_sessions(query=''):
     for p in SESSIONS_DIR.glob('*.json'):
         try:
             s=SessionData.model_validate(json.loads(p.read_text(encoding='utf-8')))
-            hay=' '.join([s.title]+[x.source+' '+x.translation for x in s.segments]+[a.text for a in s.annotations]).lower()
+            qa_text=[turn.original+' '+turn.translation+' '+turn.answer for turn in s.defense_qa]
+            hay=' '.join([s.title]+[x.source+' '+x.translation for x in s.segments]+[a.text for a in s.annotations]+qa_text).lower()
             if not q or q in hay: items.append(s)
         except Exception: pass
     return sorted(items,key=lambda x:x.updated_at,reverse=True)
@@ -38,6 +39,8 @@ def patch_title(session_id,title): s=get_session(session_id); s.title=title.stri
 def add_annotation(session_id,annotation:Annotation): s=get_session(session_id); s.annotations.append(annotation); s.annotations.sort(key=lambda x:(x.timestamp_ms,x.created_at)); save_session(s); return s
 def add_screenshot(session_id,shot:ScreenshotAsset): s=get_session(session_id); s.screenshots.append(shot); s.screenshots.sort(key=lambda x:(x.timestamp_ms,x.created_at)); save_session(s); return s
 def add_audio_file(session_id,filename): s=get_session(session_id); (s.audio_files.append(filename) if filename not in s.audio_files else None); save_session(s); return s
+def add_defense_turn(session_id,turn:DefenseQATurn):
+    s=get_session(session_id); s.defense_qa.append(turn); save_session(s); return s
 def delete_session(session_id):
     p=_path(session_id)
     if not p.exists(): raise FileNotFoundError(session_id)
