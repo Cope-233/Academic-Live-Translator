@@ -15,7 +15,7 @@ from app import main
 
 
 def test_version():
-    assert __version__ == "beta 0.9"
+    assert __version__ == "1.0"
 
 
 def test_defaults():
