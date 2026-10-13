@@ -170,6 +170,15 @@ class ScreenshotAsset(BaseModel):
     filename: str
     note: str = ""
     created_at: str
+class DefenseQATurn(BaseModel):
+    id: str
+    original: str = ""
+    translation: str = ""
+    answer: str
+    model: str = "auto"
+    reasoning_effort: str = "medium"
+    duration_ms: int = 0
+    created_at: str
 class SessionData(BaseModel):
     id: str
     title: str
@@ -183,3 +192,4 @@ class SessionData(BaseModel):
     annotations: list[Annotation] = Field(default_factory=list)
     screenshots: list[ScreenshotAsset] = Field(default_factory=list)
     audio_files: list[str] = Field(default_factory=list)
+    defense_qa: list[DefenseQATurn] = Field(default_factory=list)
