@@ -20,6 +20,7 @@ Academic Live Translator 是一个本地优先的实时语音转录、翻译与�
 - Windows WASAPI 系统音频回环与原生麦克风捕捉
 - 音频 / 视频文件转录与翻译
 - 实验性双语悬浮字幕窗，可覆盖 Zoom、WebEx、网页课程或演示文稿
+- **Defense Q&A（Experimental）**：在实时原文/翻译中选择答辩问题并发送到 Codex CLI，由 Codex 读取本地论文资料后生成可直接参考的口头回答
 - 可自定义语音分段、实时更新频率、翻译上下文、术语保护与采集保存参数，设置会自动保存在本地配置中
 - 学术术语表、重点标记、笔记、截图与 Session Library
 - TXT、Markdown、SRT、JSON 导出
@@ -117,5 +118,18 @@ http://127.0.0.1:8765
 5. 需要更换 ASR 或翻译服务时，在 **设置** 中选择本地 Whisper、Microsoft Translator 或 OpenAI-compatible Provider。
 6. 更细的语音检测、分段、实时更新、翻译与保存参数可在 **设置 → 自定义设置** 中调整，保存后下次启动会自动恢复。
 7. 单屏使用 Zoom、WebEx 或网页课程时，可启用标记为 **Experimental** 的悬浮窗，将原文与译文保持在其他窗口上方。
+
+### Defense Q&A（Experimental）
+
+该功能把实时识别/翻译得到的答辩问题发送给本机已登录的 Codex CLI。ALT 本身不运行大型 QA 模型，也不建立向量数据库。
+
+1. 安装 Codex CLI：`npm install -g @openai/codex`。
+2. 在终端运行 `codex login`，使用你的 ChatGPT/Codex 账号登录。
+3. 在 ALT **设置 → Defense Q&A** 中确认状态为 **Codex 已就绪**，点击 **打开答辩资料目录**。
+4. 将论文和答辩资料的可搜索 Markdown/TXT 版本放入 `data/defense/`。推荐将 PDF/DOCX 预先导出或转换为 Markdown/TXT。
+5. 回到 **实时** 页面启用 **Defense Q&A**，点击原文或翻译片段选择委员会问题；支持 `Shift + 点击` 连续选择多段。
+6. 点击 **发送到 Codex**。默认使用 **Fast / low reasoning**，模型保持 **Auto** 时使用当前 Codex 默认模型。
+
+Codex 以只读模式访问 `data/defense/`，不会修改论文文件。发送到在线 Codex 的内容包括所选问题，以及 Codex 为回答问题而读取的本地答辩资料内容。
 
 本地会话、模型、缓存、录音和截图默认保存在当前项目目录中；迁移或删除程序时可直接管理整个项目文件夹。

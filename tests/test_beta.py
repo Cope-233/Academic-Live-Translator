@@ -15,7 +15,7 @@ from app import main
 
 
 def test_version():
-    assert __version__ == "beta 0.8"
+    assert __version__ == "beta 0.9"
 
 
 def test_defaults():
@@ -257,7 +257,6 @@ def test_inactive_provider_profiles_survive_active_provider_changes():
         "api_key": "translate-key",
         "model": "Qwen3-4B",
     })
-
     migrated = _migrate_config(raw)
 
     assert migrated["asr"]["mode"] == "local_whisper"

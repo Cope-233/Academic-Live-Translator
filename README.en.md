@@ -20,6 +20,7 @@ Main features:
 - Windows WASAPI loopback and native microphone capture
 - Audio and video file transcription and translation
 - Experimental bilingual floating subtitle window for Zoom, WebEx, browser classes, or presentations
+- **Defense Q&A (Experimental):** select a viva question from the live transcript/translation and send it to Codex CLI, which reads local thesis materials and returns a concise spoken answer
 - Custom speech segmentation, realtime update intervals, translation context, terminology preservation, and capture/storage settings with persistent local configuration
 - Academic glossary, markers, notes, screenshots, and searchable Session Library
 - TXT, Markdown, SRT, and JSON export
@@ -119,5 +120,18 @@ http://127.0.0.1:8765
 5. To use another ASR or translation service, configure Local Whisper, Microsoft Translator, or an OpenAI-compatible provider under **Settings**.
 6. Fine-tune speech detection, segmentation, realtime updates, translation, and capture/storage behavior under **Settings → Custom settings**. Saved values are restored on the next launch.
 7. For single-screen Zoom, WebEx, or browser-course use, enable the **Experimental** floating window to keep original text and translation above other windows.
+
+### Defense Q&A (Experimental)
+
+This feature sends selected live ASR/translation text to the locally signed-in Codex CLI. ALT does not need to host a large QA model or maintain a vector database.
+
+1. Install Codex CLI: `npm install -g @openai/codex`.
+2. Run `codex login` in a terminal and sign in with your ChatGPT/Codex account.
+3. In **Settings → Defense Q&A**, confirm that Codex is ready and click **Open defense folder**.
+4. Put searchable Markdown/TXT copies of the thesis and defense references in `data/defense/`. Convert PDF/DOCX material to Markdown/TXT in advance for the most reliable live lookup.
+5. In the **Live** workspace, enable **Defense Q&A**, then click transcript or translation segments to select the committee question. `Shift + click` selects a continuous range.
+6. Click **Ask Codex**. **Fast / low reasoning** is the default; keep Model on **Auto** to use the current Codex default model.
+
+Codex accesses `data/defense/` in read-only mode. The selected question and any thesis/reference content Codex reads to answer it are processed by the online Codex service.
 
 Sessions, models, caches, recordings, and screenshots are stored inside the project directory by default, so the whole installation can be moved or removed as one folder.

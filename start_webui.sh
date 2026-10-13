@@ -30,5 +30,5 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
 else
   .venv/bin/python -m app.bootstrap
 fi
-echo "[start] Academic Live Translator beta 0.8 -> http://127.0.0.1:8765"
+echo "[start] Academic Live Translator beta 0.9 -> http://127.0.0.1:8765"
 .venv/bin/python run.py

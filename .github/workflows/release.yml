@@ -23,6 +23,7 @@ jobs:
         run: |
           node --check static/app.js
           node --check static/native_capture_ui.js
+          node --check static/defense.js
 
       - name: Install test dependencies
         run: |

@@ -1,5 +1,20 @@
 # Changelog
 
+## beta 0.9 — 2026-10-13
+
+Defense Q&A beta focused on a lightweight Codex CLI handoff instead of adding a local RAG stack or large QA model to ALT.
+
+- Added **Defense Q&A · Experimental** to the Live workspace without changing the existing ASR or translation pipeline.
+- Transcript and translation segments can be selected directly; `Shift + click` selects a continuous multi-segment committee question.
+- Added a compact Defense action bar and answer drawer with copy support, while keeping the existing bilingual workspace layout unchanged when Defense mode is off.
+- Added a dedicated Codex CLI backend using `codex exec` in read-only mode with approval prompts disabled for unattended live Q&A.
+- Added three response presets: **Fast** (`low` reasoning, default), **Balanced** (`medium`), and **Deep** (`high`).
+- Model selection defaults to **Auto**, allowing Codex to use the current account/default model; advanced users may provide an explicit model ID.
+- Added automatic Codex CLI installation/login status detection and a one-click action to open the portable `data/defense/` workspace.
+- Defense reference files remain outside the ALT session database. Users place searchable Markdown/TXT thesis materials in `data/defense/`; Codex reads them only when a question is submitted.
+- Added bilingual Defense Q&A UI, backend tests, JavaScript syntax validation, and beta 0.9 startup/release metadata.
+- No embedding model, vector database, reranker, or local large language model is required for Defense Q&A.
+
 ## beta 0.8 — 2026-10-07
 
 Customization and realtime-output beta focused on lower perceived latency and user-controlled live behavior.
@@ -24,7 +39,7 @@ Persistent provider-profile beta focused on reliable local/remote configuration 
 - The WebUI now restores the last saved active ASR and translation providers during startup instead of showing the HTML fallback choices first.
 - Switching providers now stores the previous provider's form state and loads the selected provider's own settings without clearing inactive URLs, API keys, endpoints, models, device choices, or regions.
 - Removed the beta 0.4–0.6 behavior that erased OpenAI-compatible / llama.cpp fields when Local Whisper or Bing was saved.
-- Existing beta 0.6 `data/config.json` files are migrated automatically: the currently configured providers are placed into provider-specific profiles while runtime-compatible `asr` and `translation` mirrors are preserved.
+- Existing beta 0.6 `data/config.json` files are migrated automatically: the currently configured providers are placed into provider-specific profiles while runtime-compatible `asr` / `translation` mirrors are preserved.
 - Added provider-profile migration and persistence tests, including stale legacy-mirror recovery and inactive-profile retention.
 - Fixed the beta 0.6 floating-window wrapper name collision and updated the WebUI/floating-window version label to beta 0.7.
 

@@ -19,6 +19,7 @@ jobs:
           cache: pip
       - run: node --check static/app.js
       - run: node --check static/native_capture_ui.js
+      - run: node --check static/defense.js
       - run: python -m pip install -U pip
       - run: python -m pip install -r requirements-dev.txt
       - run: python -m pytest -q
