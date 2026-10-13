@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0 — 2026-10-13
+
+First stable release, focused on making Defense Q&A usable as a persistent live viva workflow rather than a one-shot Codex handoff.
+
+- Split Defense prompting into a manually editable **system prompt** and a WebUI-editable **user prompt**. The system prompt is stored in `data/defense_config.json`; each request combines system prompt, user prompt, current committee question, and recent follow-up context.
+- Replaced the free-text Codex model field with a **model dropdown** populated automatically from the current Codex CLI model catalog (`codex debug models`, with local catalog-cache fallback).
+- Replaced the three Fast/Balanced/Deep presets with a **Reasoning effort** dropdown that follows the reasoning levels advertised by the selected Codex model, including newer levels such as `xhigh`, `max`, and `ultra` when available.
+- Added persistent **Defense Q&A history** to each ALT Session. Stored turns include original question, translation, answer, model, reasoning effort, latency, and timestamp.
+- Added **follow-up context**: recent Q&A turns from the current Session are automatically included when the next question is sent to Codex.
+- Added a **History** action in the live Defense bar and a persistent Q&A history panel in the answer drawer.
+- Session search now includes Defense questions and answers. Markdown, TXT, and JSON exports include saved Defense Q&A history.
+- Existing beta 0.9 Defense settings migrate automatically: Fast → `low`, Balanced → `medium`, Deep → `high`.
+- Promoted application, startup labels, tests, and documentation to stable version **1.0**.
+
 ## beta 0.9 — 2026-10-13
 
 Defense Q&A beta focused on a lightweight Codex CLI handoff instead of adding a local RAG stack or large QA model to ALT.
@@ -133,4 +147,4 @@ First public beta.
 - OpenAI-compatible provider remains the generic integration path for llama.cpp, vLLM, LM Studio, LocalAI, and compatible services.
 - Lower endpointing latency and HTTP connection reuse.
 
-Beta builds use `beta x.y` identifiers. Semantic version numbers will begin with the first stable release.
+Stable releases use semantic version numbers beginning with 1.0.
