@@ -1,4 +1,4 @@
-name: sync beta release
+name: sync release
 
 on:
   push:
@@ -33,7 +33,7 @@ jobs:
       - name: Run Python tests
         run: python -m pytest -q
 
-      - name: Read beta version
+      - name: Read version
         id: version
         shell: bash
         run: |
@@ -47,17 +47,17 @@ jobs:
           print(m.group(1))
           PY
           )
-          if [[ "$VERSION" != beta* ]]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            exit 0
+          if [[ "$VERSION" == beta* ]]; then
+            TAG=$(echo "$VERSION" | tr ' ' '-')
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            TAG="v$VERSION"
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
           fi
-          TAG=$(echo "$VERSION" | tr ' ' '-')
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "skip=false" >> "$GITHUB_OUTPUT"
 
       - name: Build release notes from CHANGELOG
-        if: steps.version.outputs.skip == 'false'
         shell: bash
         run: |
           VERSION='${{ steps.version.outputs.version }}'
@@ -79,23 +79,32 @@ jobs:
                   out.append(line)
           notes = '\n'.join(out).strip()
           if not notes:
-              notes = f'{version} beta release.'
+              notes = f'{version} release.'
           Path('release-notes.md').write_text(notes + '\n', encoding='utf-8')
           PY
         env:
           VERSION: ${{ steps.version.outputs.version }}
 
-      - name: Move beta tag to current main
-        if: steps.version.outputs.skip == 'false'
+      - name: Publish beta tag and release
+        if: steps.version.outputs.prerelease == 'true'
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git tag -f '${{ steps.version.outputs.tag }}' "$GITHUB_SHA"
-          git push origin -f 'refs/tags/${{ steps.version.outputs.tag }}'
+          git tag -f "$TAG" "$GITHUB_SHA"
+          git push origin -f "refs/tags/$TAG"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --title "$VERSION" --notes-file release-notes.md --prerelease
+          else
+            gh release create "$TAG" --title "$VERSION" --notes-file release-notes.md --prerelease --target "$GITHUB_SHA"
+          fi
 
-      - name: Create or update GitHub Release
-        if: steps.version.outputs.skip == 'false'
+      - name: Publish stable tag and release
+        if: steps.version.outputs.prerelease == 'false'
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -103,14 +112,11 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release edit "$TAG" \
-              --title "$VERSION" \
-              --notes-file release-notes.md \
-              --prerelease
-          else
-            gh release create "$TAG" \
-              --title "$VERSION" \
-              --notes-file release-notes.md \
-              --prerelease \
-              --target "$GITHUB_SHA"
+            echo "Stable release $TAG already exists; leaving its tag and release unchanged."
+            exit 0
           fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git tag "$TAG" "$GITHUB_SHA"
+          git push origin "refs/tags/$TAG"
+          gh release create "$TAG" --title "$VERSION" --notes-file release-notes.md --target "$GITHUB_SHA"
