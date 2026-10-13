@@ -48,8 +48,9 @@
     $('defenseSelectionCount').textContent = text(`已选择 ${count} 条`, `${count} selected`);
     $('defenseAskBtn').disabled = count === 0;
     $('defenseClearBtn').disabled = count === 0;
-    const preview = selectedPayload();
-    $('defenseSelectionPreview').textContent = preview.translation || preview.original || text('点击原文或翻译片段选择委员会问题。','Click transcript segments to select the committee question.');
+    $('defenseSelectionPreview').textContent = count
+      ? text('所选片段已加入问题，可发送给 Codex。','Selected segments are ready to send to Codex.')
+      : text('点击原文或翻译片段选择委员会问题。','Click transcript segments to select the committee question.');
   }
 
   function selectedPayload(){

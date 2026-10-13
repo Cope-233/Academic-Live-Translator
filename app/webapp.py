@@ -16,11 +16,11 @@ async def inject_defense_assets(request: Request, call_next):
         html = html.replace("beta 0.8", "beta 0.9")
         html = html.replace(
             "</head>",
-            '  <link rel="stylesheet" href="/static/defense.css">\n</head>',
+            '  <link rel="stylesheet" href="/static/defense.css?v=2">\n</head>',
         )
         html = html.replace(
             "</body>",
-            '  <script src="/static/defense.js"></script>\n</body>',
+            '  <script src="/static/defense.js?v=2"></script>\n</body>',
         )
         return HTMLResponse(html)
     return await call_next(request)

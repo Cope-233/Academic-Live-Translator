@@ -2,11 +2,11 @@
 body.defense-mode .segment[data-segment-id]{cursor:pointer;transition:background .12s,border-color .12s}
 body.defense-mode .segment[data-segment-id]:hover{background:#182746}
 body.defense-mode .segment.defense-selected{background:#24284b;border-bottom-color:#6979d9;box-shadow:inset 3px 0 0 #7d8cff}
-.defense-bar{display:none;width:100%;max-width:100%;min-width:0;align-items:center;justify-content:space-between;gap:12px;margin:-5px 0 14px;padding:10px 12px;border:1px solid #4a456d;background:#151d35;border-radius:12px}
-body.defense-mode .defense-bar{display:flex}
-.defense-bar-copy{display:flex;flex:1 1 0;align-items:center;gap:10px;min-width:0}
+.defense-bar{display:none;width:100%;max-width:100%;min-width:0;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;margin:-5px 0 14px;padding:10px 12px;border:1px solid #4a456d;background:#151d35;border-radius:12px}
+body.defense-mode .defense-bar{display:grid}
+.defense-bar-copy{display:grid;grid-template-columns:max-content minmax(0,1fr);align-items:center;gap:10px;min-width:0;overflow:hidden}
 .defense-bar-copy strong{white-space:nowrap}
-.defense-bar-copy span{flex:1 1 auto;min-width:0;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.defense-bar-copy span{display:block;min-width:0;max-width:100%;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .defense-bar-actions{display:flex;gap:7px;flex:0 0 auto}
 .defense-drawer{position:fixed;right:22px;bottom:22px;width:min(500px,calc(100vw - 44px));max-height:72vh;z-index:45;display:none;flex-direction:column;box-shadow:0 18px 60px #0008;overflow:hidden}
 .defense-drawer.open{display:flex}
@@ -31,7 +31,7 @@ body.defense-mode .defense-bar{display:flex}
 .defense-advanced summary{cursor:pointer;color:#b9c3d6}
 .defense-advanced label{max-width:420px}
 @media(max-width:700px){
-  .defense-bar{align-items:stretch;flex-direction:column}
+  .defense-bar{grid-template-columns:minmax(0,1fr);align-items:stretch}
   .defense-bar-actions{width:100%}
   .defense-bar-actions button{flex:1}
   .defense-settings-grid{grid-template-columns:1fr}
