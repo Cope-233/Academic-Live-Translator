@@ -6,7 +6,7 @@ Academic Live Translator 是一个本地优先的实时语音转录、翻译与�
 
 ## 项目介绍
 
-项目将实时音频采集、ASR、翻译与学术记录整合到一个浏览器工作区中，并尽量将模型、配置、缓存和会话数据保存在项目目录内，方便迁移与管理。
+项目将实时音频采集、ASR、翻译与学术记录整合到一个浏览器工作区中，并尽量将模型、配置、缓存和会话数据保存在项目目录内，方便迁移与管理。当前正式版本为 **1.0**。
 
 主要功能：
 
@@ -20,10 +20,10 @@ Academic Live Translator 是一个本地优先的实时语音转录、翻译与�
 - Windows WASAPI 系统音频回环与原生麦克风捕捉
 - 音频 / 视频文件转录与翻译
 - 实验性双语悬浮字幕窗，可覆盖 Zoom、WebEx、网页课程或演示文稿
-- **Defense Q&A（Experimental）**：在实时原文/翻译中选择答辩问题并发送到 Codex CLI，由 Codex 读取本地论文资料后生成可直接参考的口头回答
+- **Defense Q&A（Experimental）**：从实时原文/翻译中选择答辩问题，交给 Codex CLI 检索本地论文资料并生成可直接参考的口头回答；支持自动模型发现、模型对应推理强度、系统/用户 Prompt 分层、Q&A 本地持久化与追问上下文
 - 可自定义语音分段、实时更新频率、翻译上下文、术语保护与采集保存参数，设置会自动保存在本地配置中
 - 学术术语表、重点标记、笔记、截图与 Session Library
-- TXT、Markdown、SRT、JSON 导出
+- TXT、Markdown、SRT、JSON 导出；Markdown/TXT/JSON 会包含 Defense Q&A 记录
 - Portable-by-default：`.venv/`、`data/`、`models/`、`runtime/`、`cache/`、`logs/` 均保存在项目目录内
 
 ### Whisper 模型选择建议
@@ -121,15 +121,18 @@ http://127.0.0.1:8765
 
 ### Defense Q&A（Experimental）
 
-该功能把实时识别/翻译得到的答辩问题发送给本机已登录的 Codex CLI。ALT 本身不运行大型 QA 模型，也不建立向量数据库。
+Defense Q&A 使用本机已登录的 Codex CLI。ALT 不需要额外运行大型 QA 模型，也不需要建立向量数据库。Codex 会在只读模式下检索 `data/defense/` 中的论文和答辩资料。
 
 1. 安装 Codex CLI：`npm install -g @openai/codex`。
 2. 在终端运行 `codex login`，使用你的 ChatGPT/Codex 账号登录。
 3. 在 ALT **设置 → Defense Q&A** 中确认状态为 **Codex 已就绪**，点击 **打开答辩资料目录**。
 4. 将论文和答辩资料的可搜索 Markdown/TXT 版本放入 `data/defense/`。推荐将 PDF/DOCX 预先导出或转换为 Markdown/TXT。
-5. 回到 **实时** 页面启用 **Defense Q&A**，点击原文或翻译片段选择委员会问题；支持 `Shift + 点击` 连续选择多段。
-6. 点击 **发送到 Codex**。默认使用 **Fast / low reasoning**，模型保持 **Auto** 时使用当前 Codex 默认模型。
+5. **Codex 模型**下拉框会读取当前 Codex CLI 的模型目录；选择模型后，旁边的**推理强度**只显示该模型当前声明支持的 reasoning levels。
+6. **用户 Prompt**可直接在 WebUI 中编辑。系统 Prompt 不在 WebUI 中暴露，如需修改可编辑 `data/defense_config.json` 中的 `system_prompt`。实际发送内容会组合系统 Prompt、用户 Prompt、当前问题和同一 Session 的追问上下文。
+7. 回到 **实时** 页面启用 **Defense Q&A**，点击原文或翻译片段选择委员会问题；支持 `Shift + 点击` 连续选择多段。
+8. 点击 **发送到 Codex**。每轮问答会写入当前 Session 的本地数据文件；下一次提问会自动携带最近的 Defense Q&A 作为追问上下文。
+9. 点击 Defense 工具条中的 **历史** 可查看当前 Session 已保存的问答记录；这些记录也会随 Session 一起出现在 Markdown/TXT/JSON 导出中。
 
-Codex 以只读模式访问 `data/defense/`，不会修改论文文件。发送到在线 Codex 的内容包括所选问题，以及 Codex 为回答问题而读取的本地答辩资料内容。
+Codex 以只读模式访问 `data/defense/`，不会修改论文文件。发送到在线 Codex 的内容包括所选问题、系统/用户 Prompt、必要的追问上下文，以及 Codex 为回答问题而读取的本地答辩资料内容。
 
-本地会话、模型、缓存、录音和截图默认保存在当前项目目录中；迁移或删除程序时可直接管理整个项目文件夹。
+本地会话、Defense Q&A、模型、缓存、录音和截图默认保存在当前项目目录中；迁移或删除程序时可直接管理整个项目文件夹。
