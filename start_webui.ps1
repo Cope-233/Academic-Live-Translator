@@ -23,7 +23,7 @@ if (Test-Path $cudaBin) {
     $env:PATH = "$cudaBin;$env:PATH"
 }
 
-# beta 0.9 changes application logic only; the existing beta 0.6 portable
+# 1.0 changes application logic only; the existing beta 0.6 portable
 # runtime bundle remains valid and should not be downloaded again.
 $marker = Join-Path $PSScriptRoot "data\.installed-beta-0.6"
 $venvPython = Join-Path $PSScriptRoot ".venv\Scripts\python.exe"
@@ -39,6 +39,6 @@ if (-not (Test-Path $venvPython)) {
     throw "Portable Python environment was not created successfully."
 }
 
-Write-Host "[start] Academic Live Translator beta 0.9 -> http://127.0.0.1:8765"
+Write-Host "[start] Academic Live Translator 1.0 -> http://127.0.0.1:8765"
 Start-Process "http://127.0.0.1:8765"
 & $venvPython run.py
