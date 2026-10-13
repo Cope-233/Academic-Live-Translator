@@ -13,14 +13,14 @@ app.include_router(defense_router)
 async def inject_defense_assets(request: Request, call_next):
     if request.method == "GET" and request.url.path == "/":
         html = (STATIC_DIR / "index.html").read_text(encoding="utf-8")
-        html = html.replace("beta 0.8", "beta 0.9")
+        html = html.replace("beta 0.8", "1.0")
         html = html.replace(
             "</head>",
-            '  <link rel="stylesheet" href="/static/defense.css?v=2">\n</head>',
+            '  <link rel="stylesheet" href="/static/defense.css?v=3">\n</head>',
         )
         html = html.replace(
             "</body>",
-            '  <script src="/static/defense.js?v=2"></script>\n</body>',
+            '  <script src="/static/defense.js?v=3"></script>\n</body>',
         )
         return HTMLResponse(html)
     return await call_next(request)
