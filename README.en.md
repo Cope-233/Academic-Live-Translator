@@ -6,7 +6,7 @@ Academic Live Translator is a local-first WebUI for real-time speech transcripti
 
 ## Project overview
 
-The project combines live audio capture, ASR, translation, and academic note-taking in one browser workspace. Models, configuration, caches, and session data are kept inside the project directory whenever possible, making the application easy to move and manage.
+The project combines live audio capture, ASR, translation, and academic note-taking in one browser workspace. Models, configuration, caches, and session data are kept inside the project directory whenever possible, making the application easy to move and manage. The current stable release is **1.0**.
 
 Main features:
 
@@ -20,10 +20,10 @@ Main features:
 - Windows WASAPI loopback and native microphone capture
 - Audio and video file transcription and translation
 - Experimental bilingual floating subtitle window for Zoom, WebEx, browser classes, or presentations
-- **Defense Q&A (Experimental):** select a viva question from the live transcript/translation and send it to Codex CLI, which reads local thesis materials and returns a concise spoken answer
+- **Defense Q&A (Experimental):** select a viva question from the live transcript/translation and send it to Codex CLI, which searches local thesis materials and returns a concise spoken answer; includes automatic Codex model discovery, model-specific reasoning levels, layered system/user prompts, persistent Q&A history, and follow-up context
 - Custom speech segmentation, realtime update intervals, translation context, terminology preservation, and capture/storage settings with persistent local configuration
 - Academic glossary, markers, notes, screenshots, and searchable Session Library
-- TXT, Markdown, SRT, and JSON export
+- TXT, Markdown, SRT, and JSON export; Markdown/TXT/JSON include Defense Q&A history
 - Portable-by-default storage: `.venv/`, `data/`, `models/`, `runtime/`, `cache/`, and `logs/` stay inside the project directory
 
 ### Choosing a Whisper model
@@ -123,15 +123,18 @@ http://127.0.0.1:8765
 
 ### Defense Q&A (Experimental)
 
-This feature sends selected live ASR/translation text to the locally signed-in Codex CLI. ALT does not need to host a large QA model or maintain a vector database.
+Defense Q&A uses the locally signed-in Codex CLI. ALT does not need to host a separate large QA model or maintain a vector database. Codex searches thesis/reference files under `data/defense/` in read-only mode.
 
 1. Install Codex CLI: `npm install -g @openai/codex`.
 2. Run `codex login` in a terminal and sign in with your ChatGPT/Codex account.
 3. In **Settings → Defense Q&A**, confirm that Codex is ready and click **Open defense folder**.
 4. Put searchable Markdown/TXT copies of the thesis and defense references in `data/defense/`. Convert PDF/DOCX material to Markdown/TXT in advance for the most reliable live lookup.
-5. In the **Live** workspace, enable **Defense Q&A**, then click transcript or translation segments to select the committee question. `Shift + click` selects a continuous range.
-6. Click **Ask Codex**. **Fast / low reasoning** is the default; keep Model on **Auto** to use the current Codex default model.
+5. The **Codex model** dropdown is populated automatically from the current Codex CLI model catalog. After a model is selected, the adjacent **Reasoning effort** dropdown shows only the reasoning levels that model currently declares.
+6. Edit the **User prompt** directly in the WebUI. The system prompt is intentionally hidden from the WebUI; edit `system_prompt` in `data/defense_config.json` when needed. Requests combine the system prompt, user prompt, current question, and recent follow-up context.
+7. In the **Live** workspace, enable **Defense Q&A**, then click transcript or translation segments to select the committee question. `Shift + click` selects a continuous range.
+8. Click **Ask Codex**. Each completed turn is stored with the current Session and recent Defense Q&A turns are automatically included as context for follow-up questions.
+9. Click **History** on the Defense action bar to review saved Q&A for the current Session. Defense Q&A is also included in Markdown/TXT/JSON session exports.
 
-Codex accesses `data/defense/` in read-only mode. The selected question and any thesis/reference content Codex reads to answer it are processed by the online Codex service.
+Codex accesses `data/defense/` in read-only mode and cannot modify thesis files. The online Codex service processes the selected question, system/user prompts, relevant follow-up context, and any local defense material Codex reads to answer the question.
 
-Sessions, models, caches, recordings, and screenshots are stored inside the project directory by default, so the whole installation can be moved or removed as one folder.
+Sessions, Defense Q&A, models, caches, recordings, and screenshots are stored inside the project directory by default, so the whole installation can be moved or removed as one folder.
