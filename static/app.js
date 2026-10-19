@@ -32,7 +32,7 @@ const I18N = {
     academicNotes:'学术笔记', notePlaceholder:'研究想法、追问、待办…', note:'📝 笔记', important:'⭐ 重点', question:'❓ 问题', idea:'💡 想法', reference:'📚 文献', followUp:'⚠ 待跟进', saveNote:'保存笔记',
     mediaTranscription:'媒体转录', mediaDesc:'音频 / 视频 → ASR → 翻译 → 带时间戳会话。', sessionTitlePlaceholder:'会话标题', processMedia:'处理媒体', searchPlaceholder:'搜索转录、翻译或笔记', refresh:'刷新',
     interface:'界面', language:'语言', languageHint:'界面语言会立即切换并自动保存。', type:'类型', name:'名称',
-    asrHint:'本地 Whisper 会自动选择当前平台可用的加速方式，也可以手动指定 CPU。远程服务统一使用 OpenAI Chat Completions。', deviceCpu:'CPU', deviceCuda:'CUDA', deviceApple:'Apple silicon GPU（MLX / Metal）', testAsr:'测试 ASR', translationHint:'Bing Free 无需密钥但属于实验性方案；稳定部署可使用 Microsoft Translator 或 OpenAI-compatible 服务。', testTranslation:'测试翻译',
+    asrHint:'本地 Whisper 会自动选择当前平台可用的加速方式，也可以手动指定 CPU。远程服务统一使用 OpenAI Chat Completions。', downloadModel:'下载所选模型', modelInstalled:'模型已安装', modelMissing:'模型未安装，保存设置时会自动下载', modelDownloading:'正在下载（可离开此页面，失败后可重试）', modelDownloadFailed:'下载失败', deviceCpu:'CPU', deviceCuda:'CUDA', deviceApple:'Apple silicon GPU（MLX / Metal）', testAsr:'测试 ASR', translationHint:'Bing Free 无需密钥但属于实验性方案；稳定部署可使用 Microsoft Translator 或 OpenAI-compatible 服务。', testTranslation:'测试翻译',
     academicCapture:'学术与采集', translationMode:'翻译模式', lowestLatency:'最低延迟', balanced:'平衡', highestContext:'最高上下文', saveAudio:'保存音频', yes:'是', no:'否', customGlossary:'自定义术语表', saveSettings:'保存设置',
     floatingWindow:'悬浮窗', openFloatingWindow:'打开悬浮窗', closeFloatingWindow:'关闭悬浮窗', floatingWindowDesc:'将实时原文与翻译放入可缩放的置顶悬浮窗，适合 Zoom、WebEx 和网页课程。', floatingWidth:'默认宽度', floatingHeight:'默认高度', floatingFontSize:'字幕字号', floatingWindowHint:'实验性功能：需要支持 Document Picture-in-Picture 的桌面版 Chromium 浏览器（推荐 Chrome / Edge）。打开后可继续拖动窗口边缘调整大小。', floatingUnsupported:'当前浏览器不支持实验性悬浮窗。请使用较新的桌面版 Chrome 或 Edge。', backToWebUI:'返回 WebUI', experimental:'实验性',
     noSession:'尚未创建会话', saved:'已保存', settingsSaved:'设置已保存', ready:'可用', failed:'失败', noAudioDevice:'没有可用的音频设备', websocketTimeout:'WebSocket 连接超时', screenshotSaved:'截图已保存', chooseFile:'请选择文件', processing:'处理中…', done:'完成', startupError:'启动错误',
@@ -48,7 +48,7 @@ const I18N = {
     academicNotes:'Academic Notes', notePlaceholder:'Research ideas, questions, follow-ups…', note:'📝 Note', important:'⭐ Important', question:'❓ Question', idea:'💡 Idea', reference:'📚 Reference', followUp:'⚠ Follow up', saveNote:'Save note',
     mediaTranscription:'Media transcription', mediaDesc:'Audio / video → ASR → translation → timestamped session.', sessionTitlePlaceholder:'Session title', processMedia:'Process media', searchPlaceholder:'Search transcript, translation or notes', refresh:'Refresh',
     interface:'Interface', language:'Language', languageHint:'The interface language changes immediately and is saved automatically.', type:'Type', name:'Name',
-    asrHint:'Local Whisper selects the available accelerator automatically. You can also choose CPU explicitly. Remote ASR uses OpenAI Chat Completions.', deviceCpu:'CPU', deviceCuda:'CUDA', deviceApple:'Apple silicon GPU (MLX / Metal)', testAsr:'Test ASR', translationHint:'Bing Free is zero-key but experimental. Use Microsoft Translator or an OpenAI-compatible service for reliable deployments.', testTranslation:'Test translation',
+    asrHint:'Local Whisper selects the available accelerator automatically. You can also choose CPU explicitly. Remote ASR uses OpenAI Chat Completions.', downloadModel:'Download selected model', modelInstalled:'Model installed', modelMissing:'Not installed; saving will download it', modelDownloading:'Downloading (you can leave this page; retry if needed)', modelDownloadFailed:'Download failed', deviceCpu:'CPU', deviceCuda:'CUDA', deviceApple:'Apple silicon GPU (MLX / Metal)', testAsr:'Test ASR', translationHint:'Bing Free is zero-key but experimental. Use Microsoft Translator or an OpenAI-compatible service for reliable deployments.', testTranslation:'Test translation',
     academicCapture:'Academic & capture', translationMode:'Translation mode', lowestLatency:'Lowest latency', balanced:'Balanced', highestContext:'Highest context', saveAudio:'Save audio', yes:'Yes', no:'No', customGlossary:'Custom glossary', saveSettings:'Save settings',
     floatingWindow:'Floating window', openFloatingWindow:'Open floating window', closeFloatingWindow:'Close floating window', floatingWindowDesc:'Show live original text and translation in a resizable always-on-top window for Zoom, WebEx, and browser classes.', floatingWidth:'Default width', floatingHeight:'Default height', floatingFontSize:'Subtitle font size', floatingWindowHint:'Experimental: requires a desktop Chromium browser with Document Picture-in-Picture support (Chrome / Edge recommended). You can resize the floating window by dragging its edges.', floatingUnsupported:'This browser does not support the experimental floating window. Please use a recent desktop Chrome or Edge.', backToWebUI:'Back to WebUI', experimental:'Experimental',
     noSession:'No session yet', saved:'Saved', settingsSaved:'Settings saved', ready:'Ready', failed:'Failed', noAudioDevice:'No audio device available', websocketTimeout:'WebSocket timeout', screenshotSaved:'Screenshot saved', chooseFile:'Choose a file', processing:'Processing…', done:'Done', startupError:'Startup error',
@@ -106,6 +106,54 @@ function providerUI(){
   $('asrRemote').style.display=$('asrMode').value==='local_whisper'?'none':'block';
   $('mtOpenAI').style.display=$('mtMode').value==='openai_chat'?'block':'none';
   $('mtAzure').style.display=$('mtMode').value==='azure_translator'?'block':'none';
+}
+
+let whisperDownloadBusy = false;
+
+function selectedWhisperDevice(){ return $('asrDevice').value || 'auto'; }
+
+async function whisperModelStatus(name = $('asrModel').value, device = selectedWhisperDevice()){
+  const data = await api('/api/models/whisper?device='+encodeURIComponent(device));
+  return data.models.find(model => model.name === name);
+}
+
+function showWhisperModelStatus(info, name, device){
+  if($('asrModel').value !== name || selectedWhisperDevice() !== device) return;
+  const label = info.state === 'installed' ? tr('modelInstalled')
+    : info.state === 'downloading' ? tr('modelDownloading')
+    : info.state === 'error' ? tr('modelDownloadFailed') + ': ' + info.error
+    : tr('modelMissing');
+  $('asrModelStatus').textContent = label;
+  $('downloadAsrModelBtn').disabled = whisperDownloadBusy || info.state === 'installed' || info.state === 'downloading';
+}
+
+async function refreshWhisperModelStatus(){
+  if($('asrMode').value !== 'local_whisper') return;
+  const name = $('asrModel').value, device = selectedWhisperDevice();
+  try { showWhisperModelStatus(await whisperModelStatus(name, device), name, device); }
+  catch(e){ $('asrModelStatus').textContent = e.message; }
+}
+
+async function ensureSelectedWhisperModel(){
+  const name = $('asrModel').value, device = selectedWhisperDevice();
+  const initial = await whisperModelStatus(name, device);
+  if(initial.state === 'installed') { showWhisperModelStatus(initial,name,device); return; }
+  whisperDownloadBusy = true;
+  $('downloadAsrModelBtn').disabled = true;
+  $('asrModelStatus').textContent = tr('modelDownloading');
+  try {
+    await api('/api/models/whisper/'+encodeURIComponent(name)+'/download?device='+encodeURIComponent(device), {method:'POST'});
+    while(true){
+      const status = await whisperModelStatus(name,device);
+      showWhisperModelStatus(status,name,device);
+      if(status.state === 'installed') return;
+      if(status.state === 'error') throw new Error(status.error || tr('modelDownloadFailed'));
+      await new Promise(resolve=>setTimeout(resolve,1300));
+    }
+  }finally{
+    whisperDownloadBusy = false;
+    refreshWhisperModelStatus();
+  }
 }
 
 function configureAsrDevices(devices, selected){
@@ -174,6 +222,7 @@ async function loadConfig(){
   $('floatingWindowHeight').value=c.interface?.floating_window_height||420;
   $('floatingWindowFontSize').value=c.interface?.floating_window_font_size||18;
   providerUI();
+  refreshWhisperModelStatus();
   return state.config;
 }
 
@@ -221,14 +270,21 @@ function formConfig(){
 
 async function saveConfig(){
   await ensureConfigLoaded();
-  state.config=formConfig();
-  await api('/api/config',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(state.config)});
-  $('asrMini').textContent=`${state.config.asr.name} · ${state.config.asr.model}`;
-  $('mtMini').textContent=`${state.config.translation.name} · ${state.config.translation.model}`;
-  $('saveStatus').textContent=tr('saved')+' '+new Date().toLocaleTimeString();
-  applyLanguage(state.config.interface.language);
-  renderFloatingWindow();
-  toast(tr('settingsSaved'));
+  const next = formConfig();
+  $('saveSettingsBtn').disabled = true;
+  try {
+    if(next.asr.mode === 'local_whisper') await ensureSelectedWhisperModel();
+    await api('/api/config',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(next)});
+    state.config = next;
+    $('asrMini').textContent=`${next.asr.name} · ${next.asr.model}`;
+    $('mtMini').textContent=`${next.translation.name} · ${next.translation.model}`;
+    $('saveStatus').textContent=tr('saved')+' '+new Date().toLocaleTimeString();
+    applyLanguage(next.interface.language);
+    renderFloatingWindow();
+    toast(tr('settingsSaved'));
+  }finally{
+    $('saveSettingsBtn').disabled = false;
+  }
 }
 
 async function saveUILanguage(){
@@ -249,7 +305,10 @@ async function testProvider(k){
   }catch(e){ $(k==='asr'?'asrTestResult':'mtTestResult').textContent='✕ '+e.message; }
 }
 
-$('asrMode').onchange=providerUI;
+$('asrMode').onchange=()=>{providerUI();refreshWhisperModelStatus();};
+$('asrModel').onchange=refreshWhisperModelStatus;
+$('asrDevice').onchange=refreshWhisperModelStatus;
+$('downloadAsrModelBtn').onclick=()=>ensureSelectedWhisperModel().catch(e=>{ $('asrModelStatus').textContent=tr('modelDownloadFailed')+': '+e.message; });
 $('mtMode').onchange=providerUI;
 $('uiLanguage').onchange=saveUILanguage;
 $('saveSettingsBtn').onclick=()=>saveConfig().catch(e=>toast(e.message));
