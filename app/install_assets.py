@@ -9,6 +9,7 @@ import sys
 import tempfile
 import threading
 import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -177,6 +178,15 @@ def _download_cuda_archive(url: str, archive: Path) -> None:
                 print()
             partial.replace(archive)
             return
+        except urllib.error.HTTPError as exc:
+            if exc.code == 416 and partial.exists():
+                # The partial file may already be complete. Extraction verifies it.
+                partial.replace(archive)
+                return
+            print(f"\n[setup] CUDA download attempt {attempt}/3 failed: {exc}")
+            if attempt == 3:
+                raise RuntimeError("CUDA runtime download failed; retry installation to resume.") from exc
+            time.sleep(min(2 ** attempt, 8))
         except Exception as exc:
             print(f"\n[setup] CUDA download attempt {attempt}/3 failed: {exc}")
             if attempt == 3:
