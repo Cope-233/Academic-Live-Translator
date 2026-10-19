@@ -50,7 +50,7 @@ Install Python first. After downloading or cloning the repository, simply double
 start_webui.bat
 ```
 
-On first launch, the application initializes the local environment automatically: it creates `.venv/`, installs dependencies, prepares local Whisper models, and, when an NVIDIA GPU is detected, prepares a project-local CUDA runtime.
+On first launch, the application initializes the local environment automatically: it creates `.venv/`, installs dependencies, downloads only the configured Whisper model (`base` by default), and, when an NVIDIA GPU is detected, prepares a project-local CUDA runtime.
 
 The WebUI opens at:
 
@@ -84,7 +84,7 @@ chmod +x start_webui.sh
 ./start_webui.sh
 ```
 
-The first launch creates `.venv/`, installs dependencies, and prepares the selected Whisper model. Auto mode prefers MLX / Metal acceleration on Apple silicon; CPU mode remains available under **Settings → ASR Provider → Device**.
+On Windows, other models are installed on demand through **Settings → ASR Provider**, with failed downloads resumed on retry.\n\nThe first launch creates `.venv/`, installs dependencies, and prepares the selected Whisper model. Auto mode prefers MLX / Metal acceleration on Apple silicon; CPU mode remains available under **Settings → ASR Provider → Device**.
 
 The WebUI is available at:
 
