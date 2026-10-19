@@ -469,6 +469,7 @@ function renderSession({forceLatest=false}={}){
     o.insertAdjacentHTML('beforeend',`<div class="segment" data-segment-id="${sid}"><small>${fmt(seg.start_ms)}</small>${esc(seg.source)}</div>`);
     t.insertAdjacentHTML('beforeend',`<div class="segment" data-segment-id="${sid}"><small>${fmt(seg.start_ms)}</small>${esc(seg.translation)}</div>`);
   }
+  document.dispatchEvent(new Event('alt:transcript-rendered'));
   renderNotes();
   restoreOrFollowScroll(previous,forceLatest);
   renderFloatingWindow({forceLatest});

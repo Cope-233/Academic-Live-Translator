@@ -57,10 +57,14 @@
       node.classList.toggle('defense-selected', selected.has(node.dataset.segmentId));
     });
     const count = selected.size;
-    $('defenseSelectionCount').textContent = text(`已选择 ${count} 条`, `${count} selected`);
-    $('defenseAskBtn').disabled = count === 0;
-    $('defenseClearBtn').disabled = count === 0;
-    $('defenseSelectionPreview').textContent = count
+    const countLabel = $('defenseSelectionCount');
+    const askButton = $('defenseAskBtn');
+    const clearButton = $('defenseClearBtn');
+    const preview = $('defenseSelectionPreview');
+    if(countLabel) countLabel.textContent = text(`已选择 ${count} 条`, `${count} selected`);
+    if(askButton) askButton.disabled = count === 0;
+    if(clearButton) clearButton.disabled = count === 0;
+    if(preview) preview.textContent = count
       ? text('所选片段已加入问题，可发送给 Codex。','Selected segments are ready to send to Codex.')
       : text('点击原文或翻译片段选择委员会问题。','Click transcript segments to select the committee question.');
   }
@@ -437,6 +441,7 @@
 
   async function init(){
     document.title = 'Academic Live Translator 1.0';
+    document.addEventListener('alt:transcript-rendered', syncSelectionStyles);
     const brandVersion = document.querySelector('.brand span');
     if(brandVersion) brandVersion.textContent = '1.0 · WebUI';
     injectLiveControls();

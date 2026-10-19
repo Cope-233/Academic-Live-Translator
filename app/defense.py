@@ -359,11 +359,11 @@ def run_codex_answer(
     workspace = ensure_defense_workspace()
     command = [
         codex,
+        "--ask-for-approval",
+        "never",
         "exec",
         "--sandbox",
         "read-only",
-        "--ask-for-approval",
-        "never",
         "--skip-git-repo-check",
     ]
     if config.reasoning_effort.strip():

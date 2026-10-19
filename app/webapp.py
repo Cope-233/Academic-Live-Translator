@@ -20,7 +20,7 @@ async def inject_defense_assets(request: Request, call_next):
         )
         html = html.replace(
             "</body>",
-            '  <script src="/static/defense.js?v=3"></script>\n</body>',
+            '  <script src="/static/defense.js?v=4"></script>\n</body>',
         )
         return HTMLResponse(html)
     return await call_next(request)
