@@ -58,6 +58,8 @@ The WebUI opens at:
 http://127.0.0.1:8765
 ```
 
+Other Whisper models download on demand under **Settings → ASR Provider → Whisper model**. Click **Download selected model**, or save settings to download automatically. Interrupted downloads keep their Hugging Face cache; retrying reuses existing files. The active ASR model changes only after installation succeeds.
+
 For later launches, run the same file again:
 
 ```text
@@ -84,7 +86,7 @@ chmod +x start_webui.sh
 ./start_webui.sh
 ```
 
-On Windows, other models are installed on demand through **Settings → ASR Provider**, with failed downloads resumed on retry.\n\nThe first launch creates `.venv/`, installs dependencies, and prepares the selected Whisper model. Auto mode prefers MLX / Metal acceleration on Apple silicon; CPU mode remains available under **Settings → ASR Provider → Device**.
+The first launch creates `.venv/`, installs dependencies, and prepares the selected Whisper model. Auto mode prefers MLX / Metal acceleration on Apple silicon; CPU mode remains available under **Settings → ASR Provider → Device**.
 
 The WebUI is available at:
 
