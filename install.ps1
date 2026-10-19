@@ -37,15 +37,15 @@ if ($LASTEXITCODE -ne 0) { throw "Failed to upgrade pip (exit code $LASTEXITCODE
 & $venvPython -m pip install --disable-pip-version-check -r requirements.txt
 if ($LASTEXITCODE -ne 0) { throw "Failed to install Python dependencies (exit code $LASTEXITCODE)." }
 
-Write-Host "[setup] Downloading all local Whisper models and portable runtime files..."
+Write-Host "[setup] Preparing the selected Whisper model and portable runtime files..."
 & $venvPython -m app.install_assets
 if ($LASTEXITCODE -ne 0) { throw "Portable model/runtime installation failed (exit code $LASTEXITCODE)." }
-if (-not (Test-Path (Join-Path $PSScriptRoot "data\.installed-beta-0.6"))) {
-    throw "Portable installation did not create the beta 0.6 completion marker."
+if (-not (Test-Path (Join-Path $PSScriptRoot "data\.installed-lite-1.0"))) {
+    throw "Portable installation did not create the lightweight 1.0 completion marker."
 }
 
 Write-Host ""
-Write-Host "[done] Academic Live Translator beta 0.6 is installed."
+Write-Host "[done] Academic Live Translator 1.0 is installed."
 Write-Host "[done] Models: .\models\faster-whisper\"
 Write-Host "[done] CUDA runtime (when NVIDIA is detected): .\runtime\cuda12\bin\"
 Write-Host "[done] Start with start_webui.bat or start_webui.ps1"

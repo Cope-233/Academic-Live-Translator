@@ -50,13 +50,15 @@ Install Python first. After downloading or cloning the repository, simply double
 start_webui.bat
 ```
 
-On first launch, the application initializes the local environment automatically: it creates `.venv/`, installs dependencies, prepares local Whisper models, and, when an NVIDIA GPU is detected, prepares a project-local CUDA runtime.
+On first launch, the application initializes the local environment automatically: it creates `.venv/`, installs dependencies, downloads only the configured Whisper model (`base` by default), and, when an NVIDIA GPU is detected, prepares a project-local CUDA runtime.
 
 The WebUI opens at:
 
 ```text
 http://127.0.0.1:8765
 ```
+
+Other Whisper models download on demand under **Settings → ASR Provider → Whisper model**. Click **Download selected model**, or save settings to download automatically. Interrupted downloads keep their Hugging Face cache; retrying reuses existing files. The active ASR model changes only after installation succeeds.
 
 For later launches, run the same file again:
 

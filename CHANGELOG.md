@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Windows first installation now downloads only the configured local Whisper model (`base` by default) instead of all five sizes.
+- Whisper models are installed on demand from the WebUI with installation status, background downloads, retry attempts, and Hugging Face cache reuse.
+- Model files are validated before being considered installed. Failed model downloads do not change the saved ASR selection.
+- Portable CUDA archive downloads now resume through HTTP Range and retry broken/incomplete archives. The installation marker was updated to allow lightweight migration.
+
 ## 1.0 — 2026-10-13
 
 First stable release, focused on making Defense Q&A usable as a persistent live viva workflow rather than a one-shot Codex handoff.

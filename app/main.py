@@ -17,6 +17,8 @@ from .audio import SpeechEndpointDetector, ensure_wav_16k_mono, segment_wav_byte
 from .capture_assets import capture_screen_png
 from .config import DATA_DIR, load_config, save_config, session_assets_dir
 from .exporters import export_json, export_markdown, export_srt, export_txt
+from .model_downloads import backend_for, ensure_whisper_model, is_model_installed, validate_model
+from .install_assets import WHISPER_MODELS
 from .models import Annotation, AnnotationRequest, AppConfig, BookmarkRequest, ScreenshotAsset, ScreenshotRequest, Segment, SessionCreateRequest, SessionPatchRequest, TranslateRequest
 from .native_capture import NativeAudioCapture, list_native_devices
 from .providers import academic_hotwords, close_http_client, prepare_local_whisper, supported_whisper_devices, test_provider, transcribe_wav, translate_text
@@ -67,6 +69,60 @@ async def get_config(): return load_config().model_dump()
 @app.put("/api/config")
 async def put_config(config: AppConfig):
     save_config(config); return {"ok": True}
+
+# Download tasks outlive the HTTP request, so switching tabs does not discard work.
+_WHISPER_DOWNLOAD_JOBS: dict[str, dict[str, str]] = {}
+
+
+def _whisper_job_key(name: str, device: str) -> str:
+    return f"{name}:{backend_for(device)}"
+
+
+def _whisper_model_state(name: str, device: str) -> dict[str, str | bool]:
+    job = _WHISPER_DOWNLOAD_JOBS.get(_whisper_job_key(name, device), {})
+    if job.get("state") == "downloading":
+        return {"name": name, "installed": False, "state": "downloading", "error": ""}
+    installed = is_model_installed(name, device)
+    return {
+        "name": name,
+        "installed": installed,
+        "state": "installed" if installed else job.get("state", "missing"),
+        "error": "" if installed else job.get("error", ""),
+    }
+
+
+@app.get("/api/models/whisper")
+async def whisper_model_status(device: str = "auto"):
+    try:
+        backend_for(device)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    return {"models": [_whisper_model_state(name, device) for name in WHISPER_MODELS]}
+
+
+@app.post("/api/models/whisper/{model_name}/download")
+async def whisper_model_download(model_name: str, device: str = "auto"):
+    try:
+        validate_model(model_name)
+        key = _whisper_job_key(model_name, device)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    current = _whisper_model_state(model_name, device)
+    if current["state"] in {"installed", "downloading"}:
+        return current
+    _WHISPER_DOWNLOAD_JOBS[key] = {"state": "downloading", "error": ""}
+
+    async def run_download():
+        try:
+            await asyncio.to_thread(ensure_whisper_model, model_name, device)
+            _WHISPER_DOWNLOAD_JOBS[key] = {"state": "installed", "error": ""}
+        except Exception as exc:
+            logger.exception("Whisper model download failed: %s", model_name)
+            _WHISPER_DOWNLOAD_JOBS[key] = {"state": "error", "error": str(exc)}
+
+    asyncio.create_task(run_download())
+    return _whisper_model_state(model_name, device)
+
 
 @app.get("/api/audio/devices")
 async def audio_devices(): return await asyncio.to_thread(list_native_devices)

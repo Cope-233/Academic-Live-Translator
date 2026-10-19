@@ -50,11 +50,13 @@ Academic Live Translator 是一个本地优先的实时语音转录、翻译与�
 start_webui.bat
 ```
 
-首次启动会自动完成项目环境初始化，包括创建 `.venv/`、安装依赖、准备本地 Whisper 模型，并在检测到 NVIDIA GPU 时准备项目目录内的 CUDA Runtime。安装完成后会自动打开：
+首次启动会自动完成项目环境初始化，包括创建 `.venv/`、安装依赖、仅下载当前选定的 Whisper 模型（默认 `base`），并在检测到 NVIDIA GPU 时准备项目目录内的 CUDA Runtime。安装完成后会自动打开：
 
 ```text
 http://127.0.0.1:8765
 ```
+
+其他 Whisper 模型不会在首次安装时预下载。在 **设置 → ASR Provider → Whisper model** 中选择新模型，点击 **下载所选模型**，或直接点击 **保存设置** 自动下载。页面会显示安装状态。网络中断后可以重新点击下载或再次启动，已有文件和 Hugging Face 缓存会被复用；失败不会切换当前 ASR 模型。
 
 之后每次使用只需要再次运行：
 

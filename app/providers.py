@@ -142,8 +142,9 @@ def _whisper_device(cfg: ProviderConfig) -> tuple[str, str]:
     return device, compute
 
 def _local_whisper_path(model_name: str):
+    from .install_assets import whisper_model_installed
     direct = MODELS_DIR / "faster-whisper" / model_name
-    return direct if (direct / "model.bin").exists() else None
+    return direct if whisper_model_installed(model_name) else None
 
 
 def _local_mlx_whisper_path(model_name: str):
@@ -202,31 +203,33 @@ def get_local_whisper(cfg: ProviderConfig):
     with _WHISPER_LOCK:
         if key in _WHISPER_MODELS:
             return _WHISPER_MODELS[key]
+
+        from .model_downloads import ensure_whisper_model
         if device == "apple":
-            _ensure_mlx_whisper_model(cfg.model)
+            ensure_whisper_model(cfg.model, "apple")
             import mlx_whisper
 
             _WHISPER_MODELS[key] = mlx_whisper
             return mlx_whisper
 
+        # Route every missing model through the same retryable, resumable
+        # installer used by WebUI instead of WhisperModel's implicit download.
+        ensure_whisper_model(cfg.model, "cpu")
         from faster_whisper import WhisperModel
 
         local_path = _local_whisper_path(cfg.model)
-        model_ref = str(local_path) if local_path else cfg.model
-        kwargs = {"device":device,"compute_type":compute}
         if local_path is None:
-            kwargs["download_root"] = str(MODELS_DIR / "faster-whisper")
+            raise RuntimeError(f"Whisper {cfg.model} is not fully installed")
+        model_ref = str(local_path)
         try:
-            model = WhisperModel(model_ref, **kwargs)
+            model = WhisperModel(model_ref, device=device, compute_type=compute)
         except Exception:
             if device == "cpu":
                 raise
-            fallback = {"device":"cpu","compute_type":"int8"}
-            if local_path is None:
-                fallback["download_root"] = str(MODELS_DIR / "faster-whisper")
-            model = WhisperModel(model_ref, **fallback)
+            model = WhisperModel(model_ref, device="cpu", compute_type="int8")
         _WHISPER_MODELS[key] = model
         return model
+
 
 def prepare_local_whisper(cfg: ProviderConfig) -> dict:
     model = get_local_whisper(cfg)
