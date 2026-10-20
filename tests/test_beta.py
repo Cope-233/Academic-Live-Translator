@@ -283,3 +283,13 @@ def test_active_profile_is_restored_even_if_legacy_mirror_is_stale():
     assert migrated["asr"]["mode"] == "openai_chat"
     assert migrated["asr"]["name"] == "llama.cpp ASR"
     assert migrated["asr"]["model"] == "Qwen3-ASR-1.7B"
+
+def test_provider_settings_hide_redundant_fields():
+    html = (PROJECT_ROOT / "static" / "index.html").read_text(encoding="utf-8")
+    scripts = "\n".join(
+        (PROJECT_ROOT / "static" / filename).read_text(encoding="utf-8")
+        for filename in ("app.js", "native_capture_ui.js")
+    )
+    for control in ("asrName", "mtName", "asrEndpoint"):
+        assert f'id="{control}"' not in html
+        assert f"$('{control}')" not in scripts
