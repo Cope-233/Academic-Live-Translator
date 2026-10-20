@@ -180,7 +180,6 @@
     const p = ensureProviderProfiles(state.config);
     const profile = clone(p.asr[mode] || defaultAsrProfile(mode));
     profile.mode = mode;
-    profile.name = $('asrName').value.trim() || profile.name || (mode === 'local_whisper' ? 'Local Whisper' : 'OpenAI-compatible ASR');
 
     if (mode === 'local_whisper') {
       profile.model = $('asrModel').value;
@@ -190,7 +189,6 @@
       profile.model = $('asrModelRemote').value.trim();
       profile.base_url = $('asrBaseUrl').value.trim();
       profile.api_key = $('asrApiKey').value;
-      profile.endpoint = $('asrEndpoint').value.trim() || null;
     }
     return profile;
   }
@@ -199,7 +197,6 @@
     const p = ensureProviderProfiles(state.config);
     const profile = p.asr[mode] || defaultAsrProfile(mode);
     $('asrMode').value = mode;
-    $('asrName').value = profile.name || '';
 
     if (mode === 'local_whisper') {
       const localModels = ['tiny', 'base', 'small', 'medium', 'large-v3-turbo'];
@@ -212,7 +209,6 @@
       $('asrModelRemote').value = profile.model || '';
       $('asrBaseUrl').value = profile.base_url || '';
       $('asrApiKey').value = profile.api_key || '';
-      $('asrEndpoint').value = profile.endpoint || '';
     }
 
     state.config.asr = clone(profile);
@@ -222,7 +218,6 @@
     const p = ensureProviderProfiles(state.config);
     const profile = clone(p.translation[mode] || defaultTranslationProfile(mode));
     profile.mode = mode;
-    profile.name = $('mtName').value.trim() || profile.name || 'Translation';
 
     if (mode === 'openai_chat') {
       profile.base_url = $('mtBaseUrl').value.trim();
@@ -243,7 +238,6 @@
     const p = ensureProviderProfiles(state.config);
     const profile = p.translation[mode] || defaultTranslationProfile(mode);
     $('mtMode').value = mode;
-    $('mtName').value = profile.name || '';
 
     if (mode === 'openai_chat') {
       $('mtBaseUrl').value = profile.base_url || '';
