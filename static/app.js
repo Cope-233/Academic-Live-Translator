@@ -31,7 +31,7 @@ const I18N = {
     source:'源语言', target:'目标语言', auto:'自动', startListening:'开始监听', stopListening:'停止监听', original:'原文', waitingAudio:'等待音频输入…', translationHere:'译文将在这里出现…',
     academicNotes:'学术笔记', notePlaceholder:'研究想法、追问、待办…', note:'📝 笔记', important:'⭐ 重点', question:'❓ 问题', idea:'💡 想法', reference:'📚 文献', followUp:'⚠ 待跟进', saveNote:'保存笔记',
     mediaTranscription:'媒体转录', mediaDesc:'音频 / 视频 → ASR → 翻译 → 带时间戳会话。', sessionTitlePlaceholder:'会话标题', processMedia:'处理媒体', searchPlaceholder:'搜索转录、翻译或笔记', refresh:'刷新',
-    interface:'界面', language:'语言', languageHint:'界面语言会立即切换并自动保存。', type:'类型', name:'名称',
+    interface:'界面', language:'语言', languageHint:'界面语言会立即切换并自动保存。', type:'类型',
     asrHint:'本地 Whisper 会自动选择当前平台可用的加速方式，也可以手动指定 CPU。远程服务统一使用 OpenAI Chat Completions。', downloadModel:'下载所选模型', modelInstalled:'模型已安装', modelMissing:'模型未安装，保存设置时会自动下载', modelDownloading:'正在下载（可离开此页面，失败后可重试）', modelDownloadFailed:'下载失败', deviceCpu:'CPU', deviceCuda:'CUDA', deviceApple:'Apple silicon GPU（MLX / Metal）', testAsr:'测试 ASR', translationHint:'Bing Free 无需密钥但属于实验性方案；稳定部署可使用 Microsoft Translator 或 OpenAI-compatible 服务。', testTranslation:'测试翻译',
     academicCapture:'学术与采集', translationMode:'翻译模式', lowestLatency:'最低延迟', balanced:'平衡', highestContext:'最高上下文', saveAudio:'保存音频', yes:'是', no:'否', customGlossary:'自定义术语表', saveSettings:'保存设置',
     floatingWindow:'悬浮窗', openFloatingWindow:'打开悬浮窗', closeFloatingWindow:'关闭悬浮窗', floatingWindowDesc:'将实时原文与翻译放入可缩放的置顶悬浮窗，适合 Zoom、WebEx 和网页课程。', floatingWidth:'默认宽度', floatingHeight:'默认高度', floatingFontSize:'字幕字号', floatingWindowHint:'实验性功能：需要支持 Document Picture-in-Picture 的桌面版 Chromium 浏览器（推荐 Chrome / Edge）。打开后可继续拖动窗口边缘调整大小。', floatingUnsupported:'当前浏览器不支持实验性悬浮窗。请使用较新的桌面版 Chrome 或 Edge。', backToWebUI:'返回 WebUI', experimental:'实验性',
@@ -47,7 +47,7 @@ const I18N = {
     source:'Source', target:'Target', auto:'Auto', startListening:'Start listening', stopListening:'Stop listening', original:'Original', waitingAudio:'Waiting for audio input…', translationHere:'Translation will appear here…',
     academicNotes:'Academic Notes', notePlaceholder:'Research ideas, questions, follow-ups…', note:'📝 Note', important:'⭐ Important', question:'❓ Question', idea:'💡 Idea', reference:'📚 Reference', followUp:'⚠ Follow up', saveNote:'Save note',
     mediaTranscription:'Media transcription', mediaDesc:'Audio / video → ASR → translation → timestamped session.', sessionTitlePlaceholder:'Session title', processMedia:'Process media', searchPlaceholder:'Search transcript, translation or notes', refresh:'Refresh',
-    interface:'Interface', language:'Language', languageHint:'The interface language changes immediately and is saved automatically.', type:'Type', name:'Name',
+    interface:'Interface', language:'Language', languageHint:'The interface language changes immediately and is saved automatically.', type:'Type',
     asrHint:'Local Whisper selects the available accelerator automatically. You can also choose CPU explicitly. Remote ASR uses OpenAI Chat Completions.', downloadModel:'Download selected model', modelInstalled:'Model installed', modelMissing:'Not installed; saving will download it', modelDownloading:'Downloading (you can leave this page; retry if needed)', modelDownloadFailed:'Download failed', deviceCpu:'CPU', deviceCuda:'CUDA', deviceApple:'Apple silicon GPU (MLX / Metal)', testAsr:'Test ASR', translationHint:'Bing Free is zero-key but experimental. Use Microsoft Translator or an OpenAI-compatible service for reliable deployments.', testTranslation:'Test translation',
     academicCapture:'Academic & capture', translationMode:'Translation mode', lowestLatency:'Lowest latency', balanced:'Balanced', highestContext:'Highest context', saveAudio:'Save audio', yes:'Yes', no:'No', customGlossary:'Custom glossary', saveSettings:'Save settings',
     floatingWindow:'Floating window', openFloatingWindow:'Open floating window', closeFloatingWindow:'Close floating window', floatingWindowDesc:'Show live original text and translation in a resizable always-on-top window for Zoom, WebEx, and browser classes.', floatingWidth:'Default width', floatingHeight:'Default height', floatingFontSize:'Subtitle font size', floatingWindowHint:'Experimental: requires a desktop Chromium browser with Document Picture-in-Picture support (Chrome / Edge recommended). You can resize the floating window by dragging its edges.', floatingUnsupported:'This browser does not support the experimental floating window. Please use a recent desktop Chrome or Edge.', backToWebUI:'Back to WebUI', experimental:'Experimental',
@@ -189,16 +189,13 @@ async function loadConfig(){
   $('asrMini').textContent=`${c.asr.name} · ${c.asr.model}`;
   $('mtMini').textContent=`${c.translation.name} · ${c.translation.model}`;
   $('asrMode').value=c.asr.mode==='local_whisper'?'local_whisper':'openai_chat';
-  $('asrName').value=c.asr.name;
   $('asrModel').value=['tiny','base','small','medium','large-v3-turbo'].includes(c.asr.model)?c.asr.model:'base';
   $('asrModelRemote').value=c.asr.model;
   configureAsrDevices(capabilities.whisper_devices||['auto','cpu'],c.asr.device||'auto');
   $('asrCompute').value=c.asr.compute_type||'auto';
   $('asrBaseUrl').value=c.asr.base_url||'';
   $('asrApiKey').value=c.asr.api_key||'';
-  $('asrEndpoint').value=c.asr.endpoint||'';
   $('mtMode').value=c.translation.mode;
-  $('mtName').value=c.translation.name;
   $('mtBaseUrl').value=c.translation.base_url||'';
   $('mtModel').value=c.translation.model||'';
   $('mtApiKey').value=c.translation.api_key||'';
@@ -242,15 +239,12 @@ function formConfig(){
   c.interface.floating_window_height=clamp(Number($('floatingWindowHeight').value)||420,220,1400);
   c.interface.floating_window_font_size=clamp(Number($('floatingWindowFontSize').value)||18,12,36);
   c.asr.mode=$('asrMode').value;
-  c.asr.name=$('asrName').value.trim()||'ASR';
   c.asr.model=c.asr.mode==='local_whisper'?$('asrModel').value:$('asrModelRemote').value.trim();
   c.asr.device=$('asrDevice').value;
   c.asr.compute_type=$('asrCompute').value;
   c.asr.base_url=$('asrBaseUrl').value.trim();
   c.asr.api_key=$('asrApiKey').value;
-  c.asr.endpoint=$('asrEndpoint').value.trim()||null;
   c.translation.mode=$('mtMode').value;
-  c.translation.name=$('mtName').value.trim()||'Translation';
   c.translation.model=c.translation.mode==='bing_web'?'bing':c.translation.mode==='azure_translator'?'translator-v3':$('mtModel').value.trim();
   c.translation.base_url=c.translation.mode==='azure_translator'?'https://api.cognitive.microsofttranslator.com':$('mtBaseUrl').value.trim();
   c.translation.api_key=c.translation.mode==='azure_translator'?$('mtAzureKey').value:$('mtApiKey').value;
